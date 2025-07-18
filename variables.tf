@@ -64,11 +64,13 @@ variable "instances" {
     "vm1" = {
       "lan1_nic_name" = "vm1-lan1-nic"
       "mgmt_nic_name" = "vm1-mgmt-nic"
+      "ha_nic_name"   = "vm1-ha-nic"
       "zone"          = "1"
     }
     "vm2" = {
       "lan1_nic_name" = "vm2-lan1-nic"
       "mgmt_nic_name" = "vm2-mgmt-nic"
+      "ha_nic_name"   = "vm2-ha-nic"
       "zone"          = "2"
     }
   }

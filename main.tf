@@ -51,6 +51,22 @@ resource "azurerm_network_interface" "mgmt_nic" {
   tags = var.tags
 }
 
+resource "azurerm_network_interface" "ha_nic" {
+  for_each            = var.instances
+  location            = var.location
+  name                = "${each.value.ha_nic_name != null ? each.value.ha_nic_name : "nios-vm-ha-${each.key}"}"
+  resource_group_name = var.resource_group_name
+  ip_configuration {
+    name                          = "ipconfig1"
+    private_ip_address_allocation = "Dynamic"
+    subnet_id                     = var.vnet_lan1_subnet_id
+  }
+  depends_on = [
+    var.vnet_lan1_subnet_id,
+  ]
+  tags = var.tags
+}
+
 resource "azurerm_network_security_group" "nsg" {
   location            = var.location
   name                = "nios-vm-securityGroup"
@@ -77,6 +93,16 @@ resource "azurerm_network_interface_security_group_association" "mgmt_nic_nsg_as
   network_security_group_id = azurerm_network_security_group.nsg.id
   depends_on = [
     azurerm_network_interface.mgmt_nic,
+    azurerm_network_security_group.nsg,
+  ]
+}
+
+resource "azurerm_network_interface_security_group_association" "ha_nic_nsg_association" {
+  for_each                  = var.instances
+  network_interface_id      = azurerm_network_interface.ha_nic[each.key].id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+  depends_on = [
+    azurerm_network_interface.ha_nic,
     azurerm_network_security_group.nsg,
   ]
 }
@@ -261,7 +287,11 @@ resource "azurerm_linux_virtual_machine" "nios_vm" {
   location                        = var.location
   zone                            = each.value.zone
   name                            = "${var.vm_name_prefix}-${each.key}"
-  network_interface_ids           = [azurerm_network_interface.lan1_nic[each.key].id, azurerm_network_interface.mgmt_nic[each.key].id]
+  network_interface_ids           = [
+    azurerm_network_interface.lan1_nic[each.key].id,
+    azurerm_network_interface.mgmt_nic[each.key].id,
+    azurerm_network_interface.ha_nic[each.key].id
+  ]
   resource_group_name             = var.resource_group_name
   size                            = var.vm_size
   boot_diagnostics {
@@ -286,6 +316,7 @@ resource "azurerm_linux_virtual_machine" "nios_vm" {
   depends_on = [
     azurerm_network_interface.lan1_nic, 
     azurerm_network_interface.mgmt_nic,
+    azurerm_network_interface.ha_nic,
   ]
   tags = var.tags
 }
