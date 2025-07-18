@@ -22,8 +22,8 @@ resource "ansible_playbook" "dns_playbook" {
   diff_mode = true
   verbosity = 1
   replayable              = true
-  ansible_playbook_binary = "/home/liamtess/.local/bin/ansible-playbook"
-  vault_password_file     = "/home/liamtess/scm/ansible/.vaultpass"
+  ansible_playbook_binary = "/path/to/binary/.local/bin/ansible-playbook"
+  vault_password_file     = "/path/to/vault"
   tags =["bind"]
 }
 */

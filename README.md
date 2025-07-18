@@ -16,7 +16,7 @@ This Terraform module deploys one or more Infoblox NIOS (Network Identity Operat
 
 ```hcl
 module "nios_vm" {
-  source = "./modules/terraform-azure-nios"
+  source = "github.com/lblundel/terraform-azure-nios"
 
   vm_name_prefix              = "nios"
   admin_username              = var.admin_username
