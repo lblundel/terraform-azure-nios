@@ -299,7 +299,7 @@ resource "azurerm_linux_virtual_machine" "nios_vm" {
   }
   os_disk {
     caching              = "ReadOnly"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = "Standard_LRS"
   }
   plan {
     name      = "vsot"
